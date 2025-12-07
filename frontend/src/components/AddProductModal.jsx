@@ -1,20 +1,21 @@
-import { useState } from 'react';
-import { FiX, FiPackage, FiDollarSign, FiImage } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import { productsAPI } from '../services/api';
+import { useState } from "react";
+import { FiX, FiPackage, FiImage } from "react-icons/fi";
+import { TbCurrencyRupee } from "react-icons/tb";
+import toast from "react-hot-toast";
+import { productsAPI } from "../services/api";
 
 const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    image: '',
-    description: '',
+    name: "",
+    price: "",
+    image: "",
+    description: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -22,17 +23,17 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (!formData.name || !formData.price || !formData.image) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
     // Validate price
     const price = parseFloat(formData.price);
     if (isNaN(price) || price <= 0) {
-      toast.error('Please enter a valid price');
+      toast.error("Please enter a valid price");
       return;
     }
 
@@ -42,18 +43,18 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
         name: formData.name,
         price: price,
         image: formData.image,
-        description: formData.description || '',
+        description: formData.description || "",
       });
-      
-      toast.success('Product added successfully!');
-      setFormData({ name: '', price: '', image: '', description: '' });
+
+      toast.success("Product added successfully!");
+      setFormData({ name: "", price: "", image: "", description: "" });
       if (onProductAdded) {
         onProductAdded();
       }
       onClose();
     } catch (error) {
-      console.error('Error creating product:', error);
-      toast.error(error.response?.data?.message || 'Failed to add product');
+      console.error("Error creating product:", error);
+      toast.error(error.response?.data?.message || "Failed to add product");
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +84,9 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
         </button>
 
         {/* Modal Header */}
-        <h2 className="text-2xl font-bold text-text-primary mb-6">Add New Product</h2>
+        <h2 className="text-2xl font-bold text-text-primary mb-6">
+          Add New Product
+        </h2>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -112,7 +115,7 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
               Price
             </label>
             <div className="relative">
-              <FiDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
+              <TbCurrencyRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
               <input
                 type="number"
                 name="price"
@@ -176,7 +179,7 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
               className="btn-primary flex-1"
               disabled={isLoading}
             >
-              {isLoading ? 'Adding...' : 'Add Product'}
+              {isLoading ? "Adding..." : "Add Product"}
             </button>
           </div>
         </form>
@@ -186,4 +189,3 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
 };
 
 export default AddProductModal;
-

@@ -1,11 +1,11 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const api = axios.create({
   baseURL: API_BASE,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -13,9 +13,11 @@ const api = axios.create({
 export const productsAPI = {
   // Get all products
   getAll: async () => {
-    const response = await api.get('/products');
+    const response = await api.get("/products");
     // Backend returns array directly
-    return Array.isArray(response.data) ? response.data : (response.data.products || []);
+    return Array.isArray(response.data)
+      ? response.data
+      : response.data.products || [];
   },
 
   // Get single product
@@ -27,7 +29,7 @@ export const productsAPI = {
 
   // Create product
   create: async (productData) => {
-    const response = await api.post('/products', productData);
+    const response = await api.post("/products", productData);
     return response.data;
   },
 
@@ -45,4 +47,3 @@ export const productsAPI = {
 };
 
 export default api;
-
