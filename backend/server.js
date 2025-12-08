@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 3001;
 // Configure CORS properly - MUST be before other middleware
 // Allow multiple origins for development and production
 const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
   : [
       "http://localhost:5173", // Development frontend
       "https://pern-stack-projects.onrender.com", // Your production frontend
@@ -35,7 +35,7 @@ app.use(
       if (!origin) {
         return callback(null, true);
       }
-      
+
       // Check if origin is in allowed list
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -59,6 +59,11 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from the React app in production BEFORE Arcjet
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+}
 
 //apply archjet enga becoz ethutha motham backend oda starting point
 // Skip Arcjet protection for OPTIONS requests (CORS preflight) and static assets
@@ -131,9 +136,6 @@ app.use(async (req, res, next) => {
 app.use("/api/products", productRoutes);
 
 if (process.env.NODE_ENV === "production") {
-  // Serve static files from the React app
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
   // Catch-all handler: send back React's index.html file for all non-API routes
   // This must be after all API routes
   app.use((req, res, next) => {
