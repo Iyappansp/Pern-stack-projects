@@ -11,6 +11,22 @@ if (process.env.NODE_ENV !== "production" && !process.env.ARCJET_ENV) {
 // LIVE = actually blocks requests (for production)
 const arcjetMode = process.env.NODE_ENV === "production" ? "LIVE" : "DRY_RUN";
 
+// Different rate limits for development vs production
+const rateLimitConfig =
+  process.env.NODE_ENV === "production"
+    ? {
+        // Production: More permissive limits for real users
+        refillRate: 10, // Refill 10 tokens per interval
+        interval: 60, // Every 60 seconds (1 minute)
+        capacity: 100, // Max 100 requests before rate limit
+      }
+    : {
+        // Development: Stricter for testing
+        refillRate: 2,
+        interval: 5,
+        capacity: 3,
+      };
+
 export const aj = arcjet({
   key: process.env.ARCJET_KEY,
   // In development, Arcjet will use 127.0.0.1 as fallback when IP is missing
@@ -25,9 +41,9 @@ export const aj = arcjet({
 
     tokenBucket({
       mode: arcjetMode,
-      refillRate: 2, // Reduced from 5 to 2 tokens per interval
-      interval: 10, // 10 seconds
-      capacity: 3, // Reduced from 10 to 3 - now 3 requests max before rate limit
+      refillRate: rateLimitConfig.refillRate,
+      interval: rateLimitConfig.interval,
+      capacity: rateLimitConfig.capacity,
     }),
   ],
 });

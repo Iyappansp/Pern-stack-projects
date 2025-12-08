@@ -20,9 +20,35 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Configure CORS properly - MUST be before other middleware
+// Allow multiple origins for development and production
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : [
+      "http://localhost:5173", // Development frontend
+      "https://pern-stack-projects.onrender.com", // Your production frontend
+    ];
+
 app.use(
   cors({
-    origin: "http://localhost:5173", // Vite dev server
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, Postman, or same-origin requests)
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      // Check if origin is in allowed list
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        // In development, be more permissive
+        if (process.env.NODE_ENV !== "production") {
+          callback(null, true);
+        } else {
+          // Reject the request without throwing an error
+          callback(null, false);
+        }
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -35,10 +61,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //apply archjet enga becoz ethutha motham backend oda starting point
-// Skip Arcjet protection for OPTIONS requests (CORS preflight)
+// Skip Arcjet protection for OPTIONS requests (CORS preflight) and static assets
 app.use(async (req, res, next) => {
   // Allow OPTIONS requests (CORS preflight) to pass through without Arcjet protection
   if (req.method === "OPTIONS") {
+    return next();
+  }
+
+  // Skip Arcjet for static assets (CSS, JS, images, fonts, etc.)
+  // This prevents CSS files from being blocked and served as JSON
+  if (
+    req.path.startsWith("/assets/") ||
+    req.path.startsWith("/static/") ||
+    req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i)
+  ) {
     return next();
   }
 
