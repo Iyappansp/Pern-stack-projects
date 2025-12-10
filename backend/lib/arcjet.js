@@ -15,10 +15,10 @@ const arcjetMode = process.env.NODE_ENV === "production" ? "LIVE" : "DRY_RUN";
 const rateLimitConfig =
   process.env.NODE_ENV === "production"
     ? {
-        // Production: More permissive limits for real users
-        refillRate: 10, // Refill 10 tokens per interval
-        interval: 60, // Every 60 seconds (1 minute)
-        capacity: 100, // Max 100 requests before rate limit
+        // Production: 30 requests max, then refill every 10 seconds
+        refillRate: 10,    // Refill 10 tokens per interval
+        interval: 10,      // Every 10 seconds (as requested)
+        capacity: 30,      // Max 30 requests before rate limit (as requested)
       }
     : {
         // Development: Stricter for testing
