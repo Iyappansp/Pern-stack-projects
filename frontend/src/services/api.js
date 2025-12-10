@@ -1,20 +1,15 @@
 import axios from "axios";
 
-// Automatically detect API URL based on environment
+// API URL configuration - optimized for same Render service
 const getApiBase = () => {
-  // Use environment variable if set (for production)
+  // Use environment variable if set (optional override)
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
   
-  // In production build, use relative URL if same domain
-  // Otherwise, you MUST set VITE_API_URL environment variable
+  // In production (same Render service), use relative URL
   if (import.meta.env.PROD) {
-    // If frontend and backend are on same domain, use relative URL
-    // If different domains, you MUST set VITE_API_URL
-    return window.location.origin.includes('localhost') 
-      ? "http://localhost:3000/api" 
-      : "/api"; // Adjust this based on your setup
+    return "/api"; // Same domain, so relative URL works
   }
   
   // Development fallback
