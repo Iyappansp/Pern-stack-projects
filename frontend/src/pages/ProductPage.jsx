@@ -33,7 +33,8 @@ const ProductPage = () => {
         });
       } catch (error) {
         console.error("Error fetching product:", error);
-        toast.error("Product not found");
+        const errorMessage = error.userMessage || error.response?.data?.message || "Product not found";
+        toast.error(errorMessage);
         navigate("/");
       } finally {
         setIsLoading(false);
@@ -80,7 +81,8 @@ const ProductPage = () => {
       navigate("/");
     } catch (error) {
       console.error("Error updating product:", error);
-      toast.error(error.response?.data?.message || "Failed to update product");
+      const errorMessage = error.userMessage || error.response?.data?.message || "Failed to update product";
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -102,7 +104,8 @@ const ProductPage = () => {
       navigate("/");
     } catch (error) {
       console.error("Error deleting product:", error);
-      toast.error("Failed to delete product");
+      const errorMessage = error.userMessage || error.response?.data?.message || "Failed to delete product";
+      toast.error(errorMessage);
     } finally {
       setIsDeleting(false);
     }

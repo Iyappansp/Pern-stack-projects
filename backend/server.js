@@ -17,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Configure CORS properly - MUST be before other middleware
 // Allow multiple origins for development and production
@@ -65,11 +65,26 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 }
 
+// Health check endpoint (before Arcjet for easy testing)
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    message: "Backend is running",
+    port: PORT,
+    timestamp: new Date().toISOString()
+  });
+});
+
 //apply archjet enga becoz ethutha motham backend oda starting point
 // Skip Arcjet protection for OPTIONS requests (CORS preflight) and static assets
 app.use(async (req, res, next) => {
   // Allow OPTIONS requests (CORS preflight) to pass through without Arcjet protection
   if (req.method === "OPTIONS") {
+    return next();
+  }
+
+  // Skip Arcjet for health check endpoint (already handled above, but keep for safety)
+  if (req.path === "/api/health") {
     return next();
   }
 
@@ -135,6 +150,20 @@ app.use(async (req, res, next) => {
 
 app.use("/api/products", productRoutes);
 
+// 404 handler for API routes (must be before production catch-all)
+// Express 5 doesn't support /api/* pattern, so we use a middleware function
+app.use((req, res, next) => {
+  // Only handle API routes that haven't been matched
+  if (req.path.startsWith("/api") && !req.route) {
+    return res.status(404).json({
+      success: false,
+      message: `API endpoint not found: ${req.method} ${req.path}`,
+    });
+  }
+  // Pass to next middleware for non-API routes
+  next();
+});
+
 if (process.env.NODE_ENV === "production") {
   // Catch-all handler: send back React's index.html file for all non-API routes
   // This must be after all API routes
@@ -165,7 +194,8 @@ async function initDB() {
   }
 }
 initDB().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log(`Access it at http://localhost:${PORT}`);
   });
 });

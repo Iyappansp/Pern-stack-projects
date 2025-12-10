@@ -21,10 +21,10 @@ const rateLimitConfig =
         capacity: 30,      // Max 30 requests before rate limit (as requested)
       }
     : {
-        // Development: Stricter for testing
-        refillRate: 2,
+        // Development: More lenient to avoid blocking during development
+        refillRate: 10,  // Changed from 2
         interval: 5,
-        capacity: 3,
+        capacity: 20,     // Changed from 3
       };
 
 export const aj = arcjet({
