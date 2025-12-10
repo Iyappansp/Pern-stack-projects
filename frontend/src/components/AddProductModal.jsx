@@ -54,7 +54,10 @@ const AddProductModal = ({ isOpen, onClose, onProductAdded }) => {
       onClose();
     } catch (error) {
       console.error("Error creating product:", error);
-      toast.error(error.response?.data?.message || "Failed to add product");
+      
+      // Use userMessage from interceptor if available, otherwise fallback
+      const errorMessage = error.userMessage || error.response?.data?.message || error.message || "Failed to add product";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

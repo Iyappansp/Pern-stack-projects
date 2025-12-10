@@ -16,12 +16,11 @@ const HomePage = () => {
       const productsList = await productsAPI.getAll();
       setProducts(productsList);
     } catch (error) {
-      // Check if it's a connection error
-      if (error.code === "ERR_NETWORK" || error.message === "Network Error") {
-        toast.error("Cannot connect to server. Please make sure the backend is running on port 3000.");
-      } else {
-        toast.error("Failed to load products");
-      }
+      console.error("Error fetching products:", error);
+      
+      // Use userMessage from interceptor if available, otherwise fallback
+      const errorMessage = error.userMessage || error.response?.data?.message || "Failed to load products";
+      toast.error(errorMessage);
       setProducts([]);
     } finally {
       setIsLoading(false);
